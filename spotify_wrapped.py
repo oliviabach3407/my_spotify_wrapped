@@ -11,6 +11,8 @@ GOOGLE_SHEETS_LINK = "" #REPLACE
 
 HOW_MANY_ARTIST = 10  # top 10 most-played artists
 HOW_MANY_SONG = 10  # top 10 most-played songs
+
+#currently, HOW_MANY_GENRES has to be a <= number than HOW_MANY_ARTIST
 HOW_MANY_GENRES = 5 # top 5 occurrences of genres within your top artists
 
 userChoseMonth = False
@@ -26,6 +28,19 @@ def count_songs_by_month(df, month):
     count = len(df[df.date.str.contains(month)])
     hours = (3 * count) / 60
     print(f"{month.upper()} SONG NUMBER: {count} (ROUGHLY {hours:.2f} HOURS)")
+
+#function to find the day that had the highest amount of songs played
+def day_with_most_songs(df):
+    #convert 'date' to datetime format
+    df['date'] = pd.to_datetime(df['date'], format='%B %d, %Y at %I:%M%p')
+    
+    #extract the date part and use Counter to count occurrences
+    date_counts = Counter(df['date'].dt.date)
+    
+    #find the day with the most songs
+    max_day, max_count = date_counts.most_common(1)[0]
+    
+    print(f"\nDAY WITH MOST SONGS: {max_day} ({max_count} SONGS)")
 
 #function to fetch genre from MusicBrainz
 def get_genre_from_musicbrainz(artist_name):
@@ -87,10 +102,15 @@ print(f'''+-----------------------------------+
 for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']:
     count_songs_by_month(df, month)
 
-#remove the time and "at" part using regex
-df['date'] = df['date'].str.replace(r" at .*$", "", regex=True)
-#now convert the cleaned 'date' column to datetime format
-df['date'] = pd.to_datetime(df['date'], format='%B %d, %Y')
+##########################
+# DAY WITH MOST LISTENS  #
+##########################
+
+day_with_most_songs(df)
+
+######################
+# GETTING USER INPUT #
+######################
 
 #filter by either month AND year or just year:
 monthOrYear = input("\nWould you like to get your results based on a month or the whole year? (Answer m or y)\n")
@@ -123,8 +143,8 @@ else:
 #some error-checking to make sure the filtering works
 if len(filtered_df) == 0:
     print(f"\n[ERROR] No data found for {month_input} {current_year}. Please check the date format.")
-else:
 
+else:
     counts_artist = Counter(filtered_df.artist)
     counts_song = Counter(filtered_df.song)
 
@@ -143,8 +163,8 @@ else:
 | Summary of Your Listening Trends |
 +----------------------------------+''')
         print(f"You LISTENED TO {len(counts_artist.items())} DIFFERENT ARTISTS IN {month_input}, {current_year}")
-        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {month_input}, {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
         print(f"You LISTENED TO {len(counts_song.items())} DIFFERENT SONGS IN {month_input}, {current_year}")
+        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {month_input}, {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
     else:
         print("\n------------------------------------------------")
         print(f"FILTERING BY YEAR: {current_year}")
@@ -154,8 +174,8 @@ else:
 | Summary of Your Listening Trends |
 +----------------------------------+''')
         print(f"You LISTENED TO {len(counts_artist.items())} DIFFERENT ARTISTS IN {current_year}")
-        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
         print(f"You LISTENED TO {len(counts_song.items())} DIFFERENT SONGS IN {current_year}")
+        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
 
     print(f'''\n+----------------+
 | Top {HOW_MANY_ARTIST} Artists |

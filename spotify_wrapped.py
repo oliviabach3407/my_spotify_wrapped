@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import requests
 import time
 
-USER_AGENT = "MySpotifyWrapped/1.0.0 ( obach2@uccs.edu )" #REPLACE
+USER_AGENT = "NameOfProgram/1.0.0 ( valid@email.address )" #REPLACE with something unique to you (the 1.0.0 is the version of your program)
 GOOGLE_SHEETS_LINK = "REPLACE THIS WITH YOUR URL" #REPLACE
 
 HOW_MANY_ARTIST = 10  # top 10 most-played artists

@@ -13,6 +13,8 @@ HOW_MANY_ARTIST = 10  # top 10 most-played artists
 HOW_MANY_SONG = 10  # top 10 most-played songs
 HOW_MANY_GENRES = 5 # top 5 occurrences of genres within your top artists
 
+userChoseMonth = False
+
 #function to dynamically convert Google Sheets URL to CSV export URL
 def convert_google_sheet_url(url):
     pattern = r'https://docs\.google\.com/spreadsheets/d/([a-zA-Z0-9-_]+)(/edit#gid=(\d+)|/edit.*)?'
@@ -59,11 +61,11 @@ def analyze_top_genres(popular_artists):
 #      MAIN       #
 ###################
 
-# Automatically detect the current year
+#automatically detect the current year
 current_year = datetime.now().year
 pandas_url = convert_google_sheet_url(GOOGLE_SHEETS_LINK)
 
-# Try loading data, with error handling
+#try loading data, with error handling
 try:
     df = pd.read_csv(pandas_url)
 except Exception as e:
@@ -85,18 +87,32 @@ print(f'''+-----------------------------------+
 for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']:
     count_songs_by_month(df, month)
 
-month_input = input("\nWhich month would you like to get specific data for?\n")
-month_input = month_input.strip().capitalize() #reformat user input
-
 #remove the time and "at" part using regex
 df['date'] = df['date'].str.replace(r" at .*$", "", regex=True)
 #now convert the cleaned 'date' column to datetime format
 df['date'] = pd.to_datetime(df['date'], format='%B %d, %Y')
 
-#filter the dataframe for the user-specified month and time-specified year
-filtered_df = df[df['date'].dt.strftime('%B %Y') == f'{month_input} {current_year}']
-#UNCOMMENT IF YOU WANT TO FILTER JUST BY YEAR (comment the line above so they don't confict)
-# filtered_df = df[df['date'].dt.strftime('%Y') == f'{current_year}']
+#filter by either month AND year or just year:
+monthOrYear = input("\nWould you like to get your results based on a month or the whole year? (Answer m or y)\n")
+if monthOrYear[0].strip().lower() == 'm':
+    month_input = input("\nWhich month would you like to get specific data for?\n")
+    month_input = month_input.strip().capitalize() #reformat user input
+
+    try:
+        #filter the google sheet by month AND year
+        filtered_df = df[df['date'].dt.strftime('%B %Y') == f'{month_input} {current_year}']
+    except Exception as e:
+        print(f"Error filtering by {month_input}. Either you entered the Month wrong, or there is no data for that month.")
+
+    userChoseMonth = True
+
+elif monthOrYear[0].strip().lower() == 'y':
+    filtered_df = df[df['date'].dt.strftime('%Y') == f'{current_year}']
+
+    userChoseMonth = False
+
+else:
+    print("Invalid Input. Please try again.")
 
 ###############################
 # SUMMARY OF LISTENING TRENDS #
@@ -106,8 +122,9 @@ filtered_df = df[df['date'].dt.strftime('%B %Y') == f'{month_input} {current_yea
 
 #some error-checking to make sure the filtering works
 if len(filtered_df) == 0:
-    print(f"No data found for {month_input} {current_year}. Please check the date format.")
+    print(f"\n[ERROR] No data found for {month_input} {current_year}. Please check the date format.")
 else:
+
     counts_artist = Counter(filtered_df.artist)
     counts_song = Counter(filtered_df.song)
 
@@ -117,13 +134,29 @@ else:
     most_popular_artists = counts_artist.most_common(HOW_MANY_ARTIST)
     most_popular_songs = counts_song.most_common(HOW_MANY_SONG)
 
-    print(f'''\n+----------------------------------+
+    if userChoseMonth:
+        print("\n------------------------------------------------")
+        print(f"FILTERING BY MONTH: {month_input} AND YEAR: {current_year}")
+        print("------------------------------------------------")
+
+        print(f'''\n+----------------------------------+
 | Summary of Your Listening Trends |
 +----------------------------------+''')
-    print(f"You LISTENED TO {len(counts_artist.items())} DIFFERENT ARTISTS IN {current_year}")
-    print(f"You LISTENED TO {len(filtered_df)} SONGS IN {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
-    print(f"You LISTENED TO {len(counts_song.items())} DIFFERENT SONGS IN {current_year}")
-    
+        print(f"You LISTENED TO {len(counts_artist.items())} DIFFERENT ARTISTS IN {month_input}, {current_year}")
+        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {month_input}, {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
+        print(f"You LISTENED TO {len(counts_song.items())} DIFFERENT SONGS IN {month_input}, {current_year}")
+    else:
+        print("\n------------------------------------------------")
+        print(f"FILTERING BY YEAR: {current_year}")
+        print("------------------------------------------------")
+
+        print(f'''\n+----------------------------------+
+| Summary of Your Listening Trends |
++----------------------------------+''')
+        print(f"You LISTENED TO {len(counts_artist.items())} DIFFERENT ARTISTS IN {current_year}")
+        print(f"You LISTENED TO {len(filtered_df)} SONGS IN {current_year} ({3*len(filtered_df)} MINUTES OR {3*len(filtered_df) / 60:.2f} HOURS)")
+        print(f"You LISTENED TO {len(counts_song.items())} DIFFERENT SONGS IN {current_year}")
+
     print(f'''\n+----------------+
 | Top {HOW_MANY_ARTIST} Artists |
 +----------------+''')    
@@ -140,6 +173,8 @@ else:
 # GENRE ANALYSIS  #
 ###################
 
+print("\n\nAccessing genre API - this will take a few seconds...")
+
 #usage with a list of top artists
 top_genres = analyze_top_genres(most_popular_artists) #replace most_popular_artists with 
 
@@ -149,7 +184,7 @@ print(f'''\n+--------------+
 
 #genres are figured out by how artists are listed on musicbrainz
 for genre, count in top_genres:
-    print(f"{genre}: {count} occurrences within your top {HOW_MANY_ARTIST} artists")
+    print(f"{genre.upper()}: {count} occurrences within your top {HOW_MANY_ARTIST} artists")
 
 #visualize top genres with a graph (this works, if you want it, just uncomment)
 # if top_genres:

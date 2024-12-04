@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import requests
 import time
 
-USER_AGENT = "NameOfProgram/1.0.0 ( valid@email.address )" #REPLACE with something unique to you (the 1.0.0 is the version of your program)
-GOOGLE_SHEETS_LINK = "REPLACE THIS WITH YOUR URL" #REPLACE
+USER_AGENT = "" #REPLACE with something unique to you (the 1.0.0 is the version of your program)
+GOOGLE_SHEETS_LINK = "" #REPLACE
 
 HOW_MANY_ARTIST = 10  # top 10 most-played artists
 HOW_MANY_SONG = 10  # top 10 most-played songs
@@ -95,6 +95,8 @@ df['date'] = pd.to_datetime(df['date'], format='%B %d, %Y')
 
 #filter the dataframe for the user-specified month and time-specified year
 filtered_df = df[df['date'].dt.strftime('%B %Y') == f'{month_input} {current_year}']
+#UNCOMMENT IF YOU WANT TO FILTER JUST BY YEAR (comment the line above so they don't confict)
+# filtered_df = df[df['date'].dt.strftime('%Y') == f'{current_year}']
 
 ###############################
 # SUMMARY OF LISTENING TRENDS #

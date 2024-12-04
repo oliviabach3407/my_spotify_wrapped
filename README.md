@@ -32,6 +32,8 @@ Inspired heavily by https://github.com/liz-stippell/spotify_data
 
 ---> utlizes the musicbrainz API to link artists to their genre (https://musicbrainz.org/doc/MusicBrainz_API)
 
+***IMPORTANT - To use the musicbrainz API, you need to have at least 1 second between each query, which is built into this script (don't remove)
+
 ---> determines your top genres based on what genre your top artists are associated with
 
 ---> can generate a graph that displays your top genres if you uncomment the code at the bottom

@@ -4,16 +4,20 @@ Inspired heavily by https://github.com/liz-stippell/spotify_data
 
 ## Instructions For Use:
 
-Follow the setup instructions outlined in this readme: https://github.com/liz-stippell/spotify_data
+1. Follow the setup instructions outlined in this readme: https://github.com/liz-stippell/spotify_data
 
-Then replace line 9 and 10 in this spotify_wrapped.py with your unique user-agent and google sheets URL.
+2. Then replace line 9 and 10 in this spotify_wrapped.py with your unique user-agent and google sheets URL.
 
-For the user-agent, it can be anything as long as it is in the format: 
+3. For the user-agent, it can be anything as long as it is in the format:
+
      NameOfProgram/1.0.0 ( valid@email.address )
 
-Extra installs:
+5. Extra installs:
+
       pip install matplotlib
+      
       pip install requests
+      
       pip install time
 
 ## What is Different In this Version: 

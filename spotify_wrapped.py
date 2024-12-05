@@ -1,3 +1,9 @@
+'''
+This is an older version of the newer and more detailed 
+spotify_wrapped script. See 'new_spotify_wrapped' for the better 
+version. I kept this one for documentation purposes.
+'''
+
 import pandas as pd
 import re
 from datetime import datetime
@@ -7,13 +13,13 @@ import requests
 import time
 
 USER_AGENT = "" #REPLACE with something unique to you (the 1.0.0 is the version of your program)
-GOOGLE_SHEETS_LINK = "" #REPLACE
+GOOGLE_SHEETS_LINK = "" #REPLACE with the entire link to your google sheet (from the browser, NOT the sharing link)
 
 HOW_MANY_ARTIST = 10  # top 10 most-played artists
 HOW_MANY_SONG = 10  # top 10 most-played songs
 
 #currently, HOW_MANY_GENRES has to be a <= number than HOW_MANY_ARTIST
-HOW_MANY_GENRES = 5 # top 5 occurrences of genres within your top artists
+HOW_MANY_GENRES = 10 # top 5 occurrences of genres within your top artists
 
 userChoseMonth = False
 
